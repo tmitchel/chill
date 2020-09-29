@@ -20,28 +20,47 @@
 </script>
 
 <main>
-	<h1>Chill</h1>
-	{#await gotQuote}
-		<p>wait</p>
-	{:then quote}
-		<blockquote>{quote.Content}</blockquote>
-		<p>- {quote.Author}</p>
-	{/await}
+	<div class="main">
+		<h1 class="title is-1">Chill</h1>
+		{#await gotQuote}
+			<p>wait</p>
+		{:then quote}
+		<article class="message is-dark quote">
+			<div class="message-header">
+			Quote of the Break
+			</div>
+			<div class="message-body">
+				{quote.Content}<br/>
+				- {quote.Author}
+			</div>
+		</article>
 
-	<h2>Tasks</h2>
-	{#await gotTasks}
-		<p>wait</p>
-	{:then tasks}
-	<ul>
-		{#each tasks as task}
-			<li>{task.Content}</li>
-		{/each}
-	</ul>
-	{/await}
+		{/await}
 
-	<h2>Actions</h2>
-	<p><button type="button" class="button is-primary" on:click={skipBreak}>Skip Break</button></p>
-	<p><button type="button" class="button is-primary" on:click={startBreak}>Start Break</button></p>
+		<h2>Tasks</h2>
+		{#await gotTasks}
+			<p>wait</p>
+		{:then tasks}
+		<ul>
+			{#each tasks as task}
+				<li>{task.Content}</li>
+			{/each}
+		</ul>
+		{/await}
+
+		<h2>Actions</h2>
+		<p><button type="button" class="button is-primary" on:click={skipBreak}>Skip Break</button></p>
+		<p><button type="button" class="button is-primary" on:click={startBreak}>Start Break</button></p>
+	</div>
 </main>
 
-<style></style>
+<style>
+.main{
+	margin-top: 10vh;	
+}
+.quote{
+	width: 60%;
+	margin: auto;
+}
+
+</style>

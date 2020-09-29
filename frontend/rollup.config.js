@@ -7,7 +7,8 @@ import image from '@rollup/plugin-image';
 import babel from 'rollup-plugin-babel';
 import polyfill from 'rollup-plugin-polyfill';
 import copy from 'rollup-plugin-copy'
-
+//added for bulma
+import postcss from 'rollup-plugin-postcss'
 
 const production = !process.env.ROLLUP_WATCH;
 
@@ -51,6 +52,7 @@ export default {
 				css.write('bundle.css');
 			}
 		}),
+		postcss(),
 
 		// If you have external dependencies installed from
 		// npm, you'll most likely need these plugins. In

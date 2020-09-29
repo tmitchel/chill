@@ -1,8 +1,9 @@
 
 
 <script>
+	import Modal from 'svelte-simple-modal';
 	import HelloWorld from './components/HelloWorld.svelte'
-	import logo from './logo.png';
+	import "../public/vendor/bulma/bulma.min.css";
 </script>
 
 <main>

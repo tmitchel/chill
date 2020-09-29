@@ -21,7 +21,7 @@ func main() {
 		Title:  "chill",
 		JS:     js,
 		CSS:    css,
-		Colour: "#131313",
+		Colour: "#FFF",
 	})
 
 	// work 30 minutes then chill for 15 secondss
