@@ -1,0 +1,22 @@
+{
+ "name": "chill",
+ "description": "Enter your project description",
+ "author": {
+  "name": "Tyler Mitchell",
+  "email": "tylerbmitchelldev@gmail.com"
+ },
+ "version": "0.1.0",
+ "binaryname": "chill",
+ "frontend": {
+  "dir": "frontend",
+  "install": "npm install",
+  "build": "npm run build",
+  "bridge": "src",
+  "serve": "npm run dev"
+ },
+ "WailsVersion": "",
+ "CrossCompile": false,
+ "Platform": "",
+ "Architecture": "",
+ "LdFlags": ""
+}
