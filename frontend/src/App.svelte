@@ -1,9 +1,7 @@
-
-
 <script>
 	import Modal from 'svelte-simple-modal';
 	import HelloWorld from './components/HelloWorld.svelte'
-	import "../public/vendor/bulma/bulma.min.css";
+	import "../node_modules/bulma/css/bulma.min.css";
 </script>
 
 <main>

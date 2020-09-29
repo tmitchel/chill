@@ -16,12 +16,13 @@ func main() {
 	css := mewn.String("./frontend/public/build/bundle.css")
 
 	a := wails.CreateApp(&wails.AppConfig{
-		Width:  1024,
-		Height: 768,
-		Title:  "chill",
-		JS:     js,
-		CSS:    css,
-		Colour: "#FFF",
+		Width:     1024,
+		Height:    768,
+		Title:     "chill",
+		JS:        js,
+		CSS:       css,
+		Colour:    "#FFF",
+		Resizable: true,
 	})
 
 	// work 30 minutes then chill for 15 secondss

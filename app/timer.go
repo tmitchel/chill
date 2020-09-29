@@ -9,18 +9,21 @@ import (
 // Timer holds the ticker for monitoring work time
 // and chill time.
 type Timer struct {
-	runtime  *wails.Runtime
-	log      *wails.CustomLogger
-	waittime time.Duration
-	worktime time.Duration
-	ticker   *time.Ticker
-	waiting  bool
-	done     <-chan struct{}
+	runtime      *wails.Runtime
+	log          *wails.CustomLogger
+	waittime     time.Duration
+	worktime     time.Duration
+	ticker       *time.Ticker
+	seconds      *time.Ticker
+	waiting      bool
+	done, reset  chan struct{}
+	secondPassed int
 }
 
 // SkipBreak resets to work time without finishing
 // the chill timer.
 func (t *Timer) SkipBreak() {
+	t.runtime.Events.Emit("test", "sent message")
 	if t.waiting {
 		t.runtime.Window.UnFullscreen()
 		t.waiting = false
@@ -33,18 +36,28 @@ func (t *Timer) StartBreak() {
 	if !t.waiting {
 		t.runtime.Window.Fullscreen()
 		t.waiting = true
-		t.ticker.Reset(t.waittime)
+		t.runtime.Events.Emit("start-break")
+	}
+}
+
+func (t *Timer) EndBreak() {
+	if t.waiting {
+		t.reset <- struct{}{}
 	}
 }
 
 // NewTimer creates a new Ticker and starts the goroutine
 // to monitor it.
-func NewTimer(waittime, worktime int) *Timer {
+func NewTimer(worktime, waittime int) *Timer {
 	t := &Timer{
-		waittime: time.Duration(waittime) * time.Second,
-		worktime: time.Duration(worktime) * time.Second,
-		ticker:   time.NewTicker(time.Duration(worktime) * time.Second),
-		waiting:  false,
+		waittime:     time.Duration(waittime) * time.Second,
+		worktime:     time.Duration(worktime) * time.Second,
+		ticker:       time.NewTicker(time.Duration(worktime) * time.Second),
+		seconds:      time.NewTicker(time.Second),
+		waiting:      false,
+		done:         make(chan struct{}),
+		reset:        make(chan struct{}),
+		secondPassed: 0,
 	}
 
 	go func() {
@@ -52,15 +65,22 @@ func NewTimer(waittime, worktime int) *Timer {
 			select {
 			case <-t.ticker.C:
 				t.log.Info("Tick")
+				t.runtime.Window.Fullscreen()
+				t.waiting = true
+				t.secondPassed = 0
+				t.runtime.Events.Emit("start-break")
+			case <-t.seconds.C:
 				if t.waiting {
-					// t.runtime.Window.UnFullscreen()
-					t.ticker.Reset(t.worktime)
-					t.waiting = false
-				} else {
-					// t.runtime.Window.Fullscreen()
-					t.ticker.Reset(t.waittime)
-					t.waiting = true
+					t.secondPassed++
+					t.runtime.Events.Emit("tick", t.secondPassed)
 				}
+			case <-t.reset:
+				t.runtime.Window.UnFullscreen()
+				t.ticker.Reset(t.worktime)
+				t.waiting = false
+				t.secondPassed = 0
+				t.runtime.Events.Emit("tick", -1)
+				t.runtime.Events.Emit("end-break")
 			case <-t.done:
 				return
 			}

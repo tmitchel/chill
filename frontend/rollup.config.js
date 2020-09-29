@@ -65,12 +65,12 @@ export default {
 		}),
 		commonjs(),
 
-        copy({
-            targets: [{ 
-					src: 'node_modules/bulma/css/bulma.min.css', 
-					dest: 'public/vendor/bulma'
-				}]
-        }),
+        // copy({
+        //     targets: [{ 
+		// 			src: 'node_modules/bulma/css/bulma.min.css', 
+		// 			dest: 'public/vendor/bulma'
+		// 		}]
+        // }),
 
 		// In dev mode, call `npm run start` once
 		// the bundle has been generated

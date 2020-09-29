@@ -24,6 +24,7 @@
     "svelte": "^3.0.0"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-free": "^5.15.0",
     "@wailsapp/runtime": "^1.0.10",
     "bulma": "^0.9.1",
     "jquery": "^3.5.1",
