@@ -29,8 +29,6 @@
 		return await window.backend.Quotes.RandomQuote();
 	}
 	let gotQuote = getQuote()
-
-
 </script>
 
 <main>

@@ -1,6 +1,6 @@
 <script>
 	import Modal from 'svelte-simple-modal';
-	import HelloWorld from './components/HelloWorld.svelte'
+	import App from './components/App.svelte'
 	import "../node_modules/bulma/css/bulma.min.css";
 </script>
 
@@ -8,7 +8,7 @@
 	<div class="App">
 		<header class="App-header">
 			<Modal>
-				<HelloWorld/>
+				<App/>
 			</Modal>
 		</header>
 	</div>
