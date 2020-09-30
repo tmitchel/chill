@@ -7,10 +7,6 @@ import (
 	"github.com/wailsapp/wails"
 )
 
-func basic() string {
-	return "World!"
-}
-
 func main() {
 	js := mewn.String("./frontend/public/build/bundle.js")
 	css := mewn.String("./frontend/public/build/bundle.css")
@@ -29,6 +25,5 @@ func main() {
 	a.Bind(app.NewTimer(30*60, 15))
 	a.Bind(app.BuildQuotes())
 	a.Bind(app.NewTasks())
-	a.Bind(basic)
 	a.Run()
 }

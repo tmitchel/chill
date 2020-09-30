@@ -23,13 +23,12 @@ type Timer struct {
 // SkipBreak resets to work time without finishing
 // the chill timer.
 func (t *Timer) SkipBreak() {
-	t.runtime.Events.Emit("test", "sent message")
 	if t.waiting {
 		t.runtime.Window.UnFullscreen()
+		t.ticker.Reset(t.worktime)
 		t.waiting = false
 		t.secondPassed = 0
-		t.ticker.Reset(t.worktime)
-		t.runtime.Events.Emit("end-break")
+		t.runtime.Events.Emit("working")
 	}
 }
 
@@ -38,7 +37,8 @@ func (t *Timer) StartBreak() {
 	if !t.waiting {
 		t.runtime.Window.Fullscreen()
 		t.waiting = true
-		t.runtime.Events.Emit("start-break")
+		t.secondPassed = 0
+		t.runtime.Events.Emit("chilling")
 	}
 }
 
@@ -66,33 +66,28 @@ func NewTimer(worktime, waittime int) *Timer {
 		for {
 			select {
 			case <-t.ticker.C:
-				t.log.Info("Tick")
-				t.runtime.Window.Fullscreen()
-				t.waiting = true
-				t.secondPassed = 0
-				t.runtime.Events.Emit("start-break")
+				t.StartBreak()
 			case <-t.seconds.C:
 				if t.waiting {
 					t.secondPassed++
+					if time.Duration(t.secondPassed)*time.Second == t.waittime {
+						t.runtime.Events.Emit("endable")
+					}
 					t.runtime.Events.Emit("tick", t.secondPassed)
 				}
 			case <-t.reset:
-				t.runtime.Window.UnFullscreen()
-				t.ticker.Reset(t.worktime)
-				t.waiting = false
-				t.secondPassed = 0
-				t.runtime.Events.Emit("tick", -1)
-				t.runtime.Events.Emit("end-break")
+				t.SkipBreak()
 			case <-t.done:
 				return
 			}
 		}
 	}()
+	t.reset <- struct{}{}
 
 	return t
 }
 
-// WailsInit is used when binding to let Timer access the runtime.Log
+// WailsInit is used when binding to let Timer access the runtime.
 func (t *Timer) WailsInit(runtime *wails.Runtime) error {
 	t.runtime = runtime
 	t.log = runtime.Log.New("Timer")
