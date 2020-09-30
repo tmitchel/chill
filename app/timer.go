@@ -27,6 +27,7 @@ func (t *Timer) SkipBreak() {
 		t.runtime.Window.UnFullscreen()
 		t.ticker.Reset(t.worktime)
 		t.waiting = false
+		t.runtime.Events.Emit("add-chill-time", t.secondPassed)
 		t.secondPassed = 0
 		t.runtime.Events.Emit("working")
 	}
@@ -37,6 +38,7 @@ func (t *Timer) StartBreak() {
 	if !t.waiting {
 		t.runtime.Window.Fullscreen()
 		t.waiting = true
+		t.runtime.Events.Emit("add-work-time", t.secondPassed)
 		t.secondPassed = 0
 		t.runtime.Events.Emit("chilling")
 	}
@@ -44,6 +46,8 @@ func (t *Timer) StartBreak() {
 
 func (t *Timer) EndBreak() {
 	if t.waiting {
+		t.runtime.Events.Emit("add-chill-time", t.secondPassed)
+		t.secondPassed = 0
 		t.reset <- struct{}{}
 	}
 }
@@ -68,12 +72,12 @@ func NewTimer(worktime, waittime int) *Timer {
 			case <-t.ticker.C:
 				t.StartBreak()
 			case <-t.seconds.C:
+				t.secondPassed++
+				t.runtime.Events.Emit("tick", t.secondPassed)
 				if t.waiting {
-					t.secondPassed++
 					if time.Duration(t.secondPassed)*time.Second == t.waittime {
 						t.runtime.Events.Emit("endable")
 					}
-					t.runtime.Events.Emit("tick", t.secondPassed)
 				}
 			case <-t.reset:
 				t.SkipBreak()
@@ -82,7 +86,6 @@ func NewTimer(worktime, waittime int) *Timer {
 			}
 		}
 	}()
-	t.reset <- struct{}{}
 
 	return t
 }

@@ -25,5 +25,6 @@ func main() {
 	a.Bind(app.NewTimer(30*60, 15))
 	a.Bind(app.BuildQuotes())
 	a.Bind(app.NewTasks())
+	a.Bind(app.NewStats())
 	a.Run()
 }

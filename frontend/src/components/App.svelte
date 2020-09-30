@@ -11,10 +11,12 @@
 
     Wails.Events.On('tick', (s) => (seconds = s));
     Wails.Events.On('chilling', () => {
+        gotStats = getStats();
         chilling = true;
         gotQuote = getQuote();
     });
     Wails.Events.On('working', () => {
+        gotStats = getStats();
         chilling = false;
         endable = false;
     });
@@ -34,6 +36,11 @@
         return await window.backend.Quotes.RandomQuote();
     };
     let gotQuote = getQuote();
+
+    const getStats = async () => {
+        return await window.backend.Stats.Get();
+    };
+    let gotStats = getStats();
 </script>
 
 <style>
@@ -48,7 +55,7 @@
         {#if chilling}
             <h1 class="subtitle is-3">Chillin' - {seconds}s</h1>
         {:else}
-            <h1 class="subtitle is-3">Working</h1>
+            <h1 class="subtitle is-3">Working - {seconds}s</h1>
         {/if}
 
         {#await gotQuote}
@@ -62,7 +69,11 @@
 
             <div class="tile is-parent is-vertical is-4">
                 <div class="tile is-child">
-                    <svelte:component this={Stats} />
+                    {#await gotStats}
+                        <p>wait</p>
+                    {:then stats}
+                        <svelte:component this={Stats} {stats} />
+                    {/await}
                 </div>
                 <div class="tile is-child">
                     <h2 class="subtitle is-3 mt-4">Actions</h2>
