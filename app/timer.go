@@ -27,7 +27,9 @@ func (t *Timer) SkipBreak() {
 	if t.waiting {
 		t.runtime.Window.UnFullscreen()
 		t.waiting = false
+		t.secondPassed = 0
 		t.ticker.Reset(t.worktime)
+		t.runtime.Events.Emit("end-break")
 	}
 }
 
