@@ -1,13 +1,18 @@
 <script>
 	import { getContext } from 'svelte';
 	import * as Wails from '@wailsapp/runtime';
+	import Tasks from './Tasks.svelte';
+	import Stats from './Stats.svelte';
+	import Quote from './Quote.svelte';
 
 	export let seconds;
-	export let taskContent;
 	export let chilling;
 
 	Wails.Events.On('tick', s => seconds = s);
-	Wails.Events.On('start-break', () => chilling = true);
+	Wails.Events.On('start-break', () => {
+		chilling = true;
+		gotQuote = getQuote();
+	});
 	Wails.Events.On('end-break', () => chilling = false);
 
 	const skipBreak = () => {
@@ -20,32 +25,18 @@
 		window.backend.Timer.EndBreak().then(() => console.log('break ended'))
 	};
 
-	const createTask = async () => {
-		await window.backend.Tasks.Create(taskContent);
-		gotTasks = getTasks();
-		taskContent = "";
-	}
-
-	const toggleStatus = async(i) => {
-		await window.backend.Tasks.ToggleStatus(i);
-		gotTasks = getTasks();
-	}
-
 	const getQuote = async () => {
 		return await window.backend.Quotes.RandomQuote();
 	}
-	const gotQuote = getQuote()
+	let gotQuote = getQuote()
 
-	const getTasks = async () => {
-		return await window.backend.Tasks.Tasks();
-	}
-	let gotTasks = getTasks();
+
 </script>
 
 <main>
 	<div class="main">
 		<h1 class="title is-1">Chill out, my guy</h1>
-		{#if seconds > 0}
+		{#if chilling}
 			<h1 class="subtitle is-3">Chillin' - {seconds}s</h1>
 		{:else}
 			<h1 class="subtitle is-3">Working</h1>
@@ -54,89 +45,15 @@
 		{#await gotQuote}
 			<p>wait</p>
 		{:then quote}
-			<article class="message is-dark quote">
-				<div class="message-header">
-				Quote of the Break
-				</div>
-				<div class="message-body">
-					<p>{quote.Content}</p>
-					<p class="is-italic">- {quote.Author}</p>
-				</div>
-			</article>
+			<svelte:component this={Quote} quote={quote}></svelte:component>
 		{/await}
 
 		<div class="tile is-ancestor">
-			<div class="tile is-child is-8">
-				<h2 class="subtitle is-3">Tasks</h2>
-				<div class="new-task">
-					<div class="field has-addons">
-						<div class="control is-expanded">
-							<input class="input" type="text" placeholder="Task" bind:value={taskContent}>
-						</div>
-						<div class="control">
-							<button class="button is-info" on:click={createTask}>Add</button>
-						</div>
-					</div>
-				</div>
-				{#await gotTasks}
-					<p>wait</p>
-				{:then tasks}
-				{#each tasks as task, i}
-					{#if task.Completed}
-						<div class="new-task">
-							<div class="field has-addons">
-								<div class="control">
-									<button class="button is-success" on:click={() => toggleStatus(i)}>Done</button>
-								</div>
-								<div class="control is-expanded">
-									<input class="input" type="text" placeholder={task.Content} readonly>
-								</div>
-							</div>
-						</div>
-					{:else}
-						<div class="new-task">
-							<div class="field has-addons">
-								<div class="control">
-									<button class="button is-danger" on:click={() => toggleStatus(i)}>Todo</button>
-								</div>
-								<div class="control is-expanded">
-									<input class="input" type="text" placeholder={task.Content} readonly>
-								</div>
-							</div>
-						</div>
-					{/if}
-				{/each}
-				{/await}
-			</div>
+			<svelte:component this={Tasks}></svelte:component>
 
 			<div class="tile is-parent is-vertical is-4">
 				<div class="tile is-child">
-					<table class="table quote">
-						<thead>
-						<tr>
-							<th>Daily Stats</th>
-							<td></td>
-						</tr>
-						</thead>
-						<tbody>
-							<tr>
-								<td>Time Working</td>
-								<td>0</td>
-							</tr>
-							<tr>
-								<td>Time Chillin</td>
-								<td>0</td>
-							</tr>
-							<tr>
-								<td>Water Drank</td>
-								<td>0</td>
-							</tr>
-							<tr>
-								<td>Tasks Complete</td>
-								<td>0</td>
-							</tr>
-						</tbody>
-					</table>
+					<svelte:component this={Stats}></svelte:component>
 				</div>
 				<div class="tile is-child">
 					<h2 class="subtitle is-3 mt-4">Actions</h2>
@@ -159,14 +76,5 @@
 <style>
 .main{
 	margin-top: 5vh;	
-}
-.quote{
-	width: 60%;
-	margin: auto;
-}
-
-.new-task{
-	width: 80%;
-	margin: auto;
 }
 </style>
