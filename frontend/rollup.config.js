@@ -6,7 +6,6 @@ import { terser } from 'rollup-plugin-terser';
 import image from '@rollup/plugin-image';
 import babel from 'rollup-plugin-babel';
 import polyfill from 'rollup-plugin-polyfill';
-import copy from 'rollup-plugin-copy'
 //added for bulma
 import postcss from 'rollup-plugin-postcss'
 
@@ -52,6 +51,8 @@ export default {
 				css.write('bundle.css');
 			}
 		}),
+		
+		// this is for bulma
 		postcss(),
 
 		// If you have external dependencies installed from
@@ -64,13 +65,6 @@ export default {
 			dedupe: ['svelte', 'svelte/transition', 'svelte/internal']
 		}),
 		commonjs(),
-
-        // copy({
-        //     targets: [{ 
-		// 			src: 'node_modules/bulma/css/bulma.min.css', 
-		// 			dest: 'public/vendor/bulma'
-		// 		}]
-        // }),
 
 		// In dev mode, call `npm run start` once
 		// the bundle has been generated

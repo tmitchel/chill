@@ -9,6 +9,7 @@
     export let chilling;
     export let endable;
 
+    // set listeners to backend events
     Wails.Events.On('tick', (s) => (seconds = s));
     Wails.Events.On('chilling', () => {
         gotStats = getStats();
@@ -22,6 +23,7 @@
     });
     Wails.Events.On('endable', () => (endable = true));
 
+    // handlers for buttons to send events
     const skipBreak = () => {
         window.backend.Timer.SkipBreak().then(() => console.log('break skipped'));
     };
@@ -32,6 +34,7 @@
         window.backend.Timer.EndBreak().then(() => console.log('break ended'));
     };
 
+    // fetch things from backend
     const getQuote = async () => {
         return await window.backend.Quotes.RandomQuote();
     };

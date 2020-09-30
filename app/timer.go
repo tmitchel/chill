@@ -44,6 +44,7 @@ func (t *Timer) StartBreak() {
 	}
 }
 
+// EndBreak resets the ticker and lets the frontend know.
 func (t *Timer) EndBreak() {
 	if t.waiting {
 		t.runtime.Events.Emit("add-chill-time", t.secondPassed)

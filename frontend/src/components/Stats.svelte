@@ -1,14 +1,20 @@
 <script>
     export let stats;
-
 </script>
+
+<style>
+    .center {
+        width: 60%;
+        margin: auto;
+    }
+</style>
 
 <table class="table center">
     <thead>
-    <tr>
-        <th>Daily Stats</th>
-        <td></td>
-    </tr>
+        <tr>
+            <th>Daily Stats</th>
+            <td />
+        </tr>
     </thead>
     <tbody>
         <tr>
@@ -29,10 +35,3 @@
         </tr>
     </tbody>
 </table>
-
-<style>
-.center{
-	width: 60%;
-	margin: auto;
-}
-</style>
