@@ -8,49 +8,56 @@ import (
 
 // Stats wraps a few statistics to monitor and display.
 type Stats struct {
-	WaterDrank    float32
-	TasksComplete int
-	TimeWorking   time.Duration
-	TimeChilling  time.Duration
+	WaterDrank    float32       `json:"water_drank"`
+	TasksComplete int           `json:"tasks_complete"`
+	TimeWorking   time.Duration `json:"time_working"`
+	TimeChilling  time.Duration `json:"time_chilling"`
+	Store         Storage       `json:"-"`
 }
 
 // NewStats returns an initialized Stats.
-func NewStats() *Stats {
+func NewStats(store Storage) *Stats {
 	return &Stats{
 		WaterDrank:    0,
 		TasksComplete: 0,
 		TimeWorking:   time.Duration(0),
 		TimeChilling:  time.Duration(0),
+		Store:         store,
 	}
 }
 
 // AddWater increments the water of the day by an amount.
 func (s *Stats) AddWater(amt float32) *Stats {
 	s.WaterDrank += amt
+	s.Store.UpdateStats(s)
 	return s
 }
 
 // CompletedTask increments the number of completed tasks.
 func (s *Stats) CompletedTask() *Stats {
 	s.TasksComplete++
+	s.Store.UpdateStats(s)
 	return s
 }
 
 // IncompletedTask decrements the number of completed tasks.
 func (s *Stats) IncompletedTask() *Stats {
 	s.TasksComplete--
+	s.Store.UpdateStats(s)
 	return s
 }
 
 // AddWorkTime increments the amount of time worked by a number of seconds.
 func (s *Stats) AddWorkTime(t int) *Stats {
 	s.TimeWorking += (time.Duration(t) * time.Second)
+	s.Store.UpdateStats(s)
 	return s
 }
 
 // AddChillTime increments the amount of time chilling by a number of seconds.
 func (s *Stats) AddChillTime(t int) *Stats {
 	s.TimeChilling += (time.Duration(t) * time.Second)
+	s.Store.UpdateStats(s)
 	return s
 }
 
