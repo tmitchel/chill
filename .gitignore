@@ -3,3 +3,9 @@ frontend/node_modules
 frontend/public/build
 frontend/public/vendor
 .chill_storage.json
+appicon.png
+chill-res.syso
+chill.exe.manifest
+chill.ico
+chill.rc
+.DS_Store
