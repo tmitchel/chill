@@ -22,6 +22,9 @@
         endable = false;
     });
     Wails.Events.On('endable', () => (endable = true));
+    Wails.Events.On('task-toggle', () => {
+        gotStats = getStats();
+    });
 
     // handlers for buttons to send events
     const skipBreak = () => {
@@ -34,6 +37,13 @@
         window.backend.Timer.EndBreak().then(() => console.log('break ended'));
     };
 
+    const addWater = () => {
+        window.backend.Stats.AddWater(1).then(() => {
+            console.log('added water');
+            gotStats = getStats();
+        });
+    }
+
     // fetch things from backend
     const getQuote = async () => {
         return await window.backend.Quotes.RandomQuote();
@@ -44,6 +54,15 @@
         return await window.backend.Stats.Get();
     };
     let gotStats = getStats();
+
+    const formatTime = (seconds) => {
+        if (seconds === undefined) {
+            return '';
+        } else if (seconds > 60) {
+            return `${Math.floor(seconds / 60)}m ${seconds % 60}s`;
+        }
+        return `${Math.floor(seconds)}s`;
+    };
 </script>
 
 <style>
@@ -56,9 +75,9 @@
     <div class="main">
         <h1 class="title is-1">Chill out, my guy</h1>
         {#if chilling}
-            <h1 class="subtitle is-3">Chillin' - {seconds}s</h1>
+            <h1 class="subtitle is-3">Chillin' - {formatTime(seconds)}</h1>
         {:else}
-            <h1 class="subtitle is-3">Working - {seconds}s</h1>
+            <h1 class="subtitle is-3">Working - {formatTime(seconds)}</h1>
         {/if}
 
         {#await gotQuote}
@@ -75,7 +94,7 @@
                     {#await gotStats}
                         <p>wait</p>
                     {:then stats}
-                        <svelte:component this={Stats} {stats} />
+                        <svelte:component this={Stats} {formatTime} {stats} />
                     {/await}
                 </div>
                 <div class="tile is-child">
@@ -86,6 +105,7 @@
                             <button type="button" class="button is-info" on:click={endBreak}> End Break </button>
                         {:else}<button disabled type="button" class="button is-info" on:click={endBreak}> End Break </button>{/if}
                     {:else}<button type="button" class="button is-info" on:click={startBreak}> Start Break </button>{/if}
+                    <button type="button" class="button is-info" on:click={addWater}> Add Water </button>
                 </div>
             </div>
         </div>

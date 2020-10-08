@@ -84,5 +84,13 @@ func (s *Stats) WailsInit(runtime *wails.Runtime) error {
 		}
 	})
 
+	// listen for change in number of tasks complete
+	runtime.Events.On("task-toggle", func(data ...interface{}) {
+		ncomplete, ok := data[0].(int)
+		if ok {
+			s.TasksComplete = ncomplete
+		}
+	})
+
 	return nil
 }

@@ -15,6 +15,7 @@ type Storage interface {
 	Reset() error
 	AddTask(*Task) error
 	UpdateStats(*Stats) error
+	GetTasks() Tasks
 }
 
 type storage struct {
@@ -50,6 +51,10 @@ func Open(file string) (Storage, error) {
 	}
 
 	return s, nil
+}
+
+func (s *storage) GetTasks() Tasks {
+	return s.Entries[time.Now().Format("2006/01/02")].Tasks
 }
 
 func (s *storage) AddTask(task *Task) error {

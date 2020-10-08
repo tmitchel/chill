@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
+	"github.com/wailsapp/wails"
 )
 
 // Task holds a single task to be completed.
@@ -16,16 +17,28 @@ type Task struct {
 
 // Tasks gives a type for a slice of Task's
 type Tasks struct {
-	T     []*Task `json:"tasks"`
-	Store Storage `json:"-"`
+	T         []*Task `json:"tasks"`
+	ncomplete int
+	Store     Storage        `json:"-"`
+	runtime   *wails.Runtime `json:"-"`
 }
 
 // NewTasks initializes the slice and returns a pointer
 // to the Tasks
 func NewTasks(store Storage) *Tasks {
+	tasks := store.GetTasks()
+	if len(tasks.T) == 0 {
+		return &Tasks{
+			T:         make([]*Task, 0),
+			Store:     store,
+			ncomplete: 0,
+		}
+	}
+
 	return &Tasks{
-		T:     make([]*Task, 0),
-		Store: store,
+		T:         tasks.Tasks(),
+		Store:     store,
+		ncomplete: 0,
 	}
 }
 
@@ -62,5 +75,20 @@ func (t *Tasks) ToggleStatus(id int) (*Task, error) {
 	}
 
 	t.T[id].Completed = !t.T[id].Completed
+	ncomplete := 0
+	for _, task := range t.T {
+		if task.Completed {
+			ncomplete++
+		}
+	}
+	t.ncomplete = ncomplete
+
+	t.runtime.Events.Emit("task-toggle", t.ncomplete)
 	return t.T[id], nil
+}
+
+// WailsInit is used when binding to let Timer access the runtime.
+func (t *Tasks) WailsInit(runtime *wails.Runtime) error {
+	t.runtime = runtime
+	return nil
 }
