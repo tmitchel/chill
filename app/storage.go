@@ -6,7 +6,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
 
@@ -14,8 +13,10 @@ type Storage interface {
 	Store(*Entry) error
 	Reset() error
 	AddTask(*Task) error
+	UpdateTasks(*Tasks) error
 	UpdateStats(*Stats) error
 	GetTasks() Tasks
+	GetStats() *Stats
 }
 
 type storage struct {
@@ -65,6 +66,14 @@ func (s *storage) GetTasks() Tasks {
 	return tasks
 }
 
+func (s *storage) GetStats() *Stats {
+	stats, ok := s.Entries[time.Now().Format("2006/01/02")]
+	if !ok {
+		return nil
+	}
+	return &stats.Stats
+}
+
 func (s *storage) AddTask(task *Task) error {
 	entry, ok := s.Entries[time.Now().Format("2006/01/02")]
 
@@ -94,10 +103,34 @@ func (s *storage) Reset() error {
 	return os.Remove(s.Name)
 }
 
+func (s *storage) UpdateTasks(tasks *Tasks) error {
+	entry, ok := s.Entries[time.Now().Format("2006/01/02")]
+	if !ok {
+		date := time.Now().Format("2006/01/02")
+		entry := Entry{
+			Date:  date,
+			Tasks: *tasks,
+		}
+		s.Entries[date] = entry
+		s.Store(&entry)
+		return nil
+	}
+	entry.Tasks = *tasks
+	s.Store(&entry)
+	return nil
+}
+
 func (s *storage) UpdateStats(stats *Stats) error {
 	entry, ok := s.Entries[time.Now().Format("2006/01/02")]
 	if !ok {
-		return errors.Errorf("No entry")
+		date := time.Now().Format("2006/01/02")
+		entry := Entry{
+			Date:  date,
+			Stats: *stats,
+		}
+		s.Entries[date] = entry
+		s.Store(&entry)
+		return nil
 	}
 	entry.Stats = *stats
 	s.Store(&entry)

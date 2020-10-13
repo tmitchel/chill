@@ -17,13 +17,17 @@ type Stats struct {
 
 // NewStats returns an initialized Stats.
 func NewStats(store Storage) *Stats {
-	return &Stats{
-		WaterDrank:    0,
-		TasksComplete: 0,
-		TimeWorking:   time.Duration(0),
-		TimeChilling:  time.Duration(0),
-		Store:         store,
+	stats := store.GetStats()
+	if stats == nil {
+		return &Stats{
+			WaterDrank:    0,
+			TasksComplete: 0,
+			TimeWorking:   time.Duration(0),
+			TimeChilling:  time.Duration(0),
+			Store:         store,
+		}
 	}
+	return stats
 }
 
 // AddWater increments the water of the day by an amount.
@@ -89,6 +93,7 @@ func (s *Stats) WailsInit(runtime *wails.Runtime) error {
 		ncomplete, ok := data[0].(int)
 		if ok {
 			s.TasksComplete = ncomplete
+			s.Store.UpdateStats(s)
 		}
 	})
 

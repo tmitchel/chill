@@ -84,6 +84,7 @@ func (t *Tasks) ToggleStatus(id int) (*Task, error) {
 	t.ncomplete = ncomplete
 
 	t.runtime.Events.Emit("task-toggle", t.ncomplete)
+	t.Store.UpdateTasks(t)
 	return t.T[id], nil
 }
 

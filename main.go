@@ -2,6 +2,8 @@ package main
 
 import (
 	"chill/app"
+	"os"
+	"path/filepath"
 
 	"github.com/leaanthony/mewn"
 	"github.com/wailsapp/wails"
@@ -11,7 +13,8 @@ func main() {
 	js := mewn.String("./frontend/public/build/bundle.js")
 	css := mewn.String("./frontend/public/build/bundle.css")
 
-	db, err := app.Open(".chill_storage.json")
+	user, _ := os.UserHomeDir()
+	db, err := app.Open(filepath.Join(user, "Documents", ".chill_storage.json"))
 	if err != nil {
 		return
 	}
