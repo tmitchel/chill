@@ -54,7 +54,15 @@ func Open(file string) (Storage, error) {
 }
 
 func (s *storage) GetTasks() Tasks {
-	return s.Entries[time.Now().Format("2006/01/02")].Tasks
+	tasks := s.Entries[time.Now().Format("2006/01/02")].Tasks
+	for _, e := range s.Entries {
+		for _, t := range e.Tasks.T {
+			if !t.Completed {
+				tasks.T = append(tasks.T, t)
+			}
+		}
+	}
+	return tasks
 }
 
 func (s *storage) AddTask(task *Task) error {
